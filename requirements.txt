@@ -1,0 +1,32 @@
+# CHD-VLM Evaluation Pipeline — Dependencies
+# Install with: pip install -r requirements.txt
+
+# Core ML / HuggingFace
+torch>=2.1.0
+transformers>=4.40.0
+accelerate>=0.27.0        # required for device_map="auto"
+huggingface_hub>=0.22.0
+
+# Image handling
+Pillow>=10.0.0
+
+# Data
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Metrics & statistics
+scikit-learn>=1.3.0
+scipy>=1.11.0             # for chi2 distribution and stats tests
+
+# Visualisation
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Utilities
+tqdm>=4.65.0
+
+# Optional — 4-bit quantisation (uncomment if using load_in_4bit=True)
+# bitsandbytes>=0.41.0
+
+# Optional — .env file support for HF_TOKEN
+# python-dotenv>=1.0.0
