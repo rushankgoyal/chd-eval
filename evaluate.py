@@ -402,7 +402,7 @@ class CHDEvaluator:
                 model = cls.from_pretrained(self.model_name, **kwargs)
                 logger.info("Loaded with %s.", cls_name)
                 break
-            except (ValueError, TypeError, OSError) as exc:
+            except (AttributeError, ValueError, TypeError, OSError) as exc:
                 logger.debug("Could not load with %s: %s", cls_name, exc)
 
         if model is None:
