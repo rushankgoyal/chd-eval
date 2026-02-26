@@ -357,19 +357,17 @@ class CHDEvaluator:
 
     def _load_model(self, load_in_4bit: bool):
         """Load processor and model from HuggingFace Hub."""
-        from transformers import AutoProcessor
+        from transformers import AutoProcessor, AutoModelForImageTextToText
 
         logger.info("Loading processor for %s …", self.model_name)
         processor = AutoProcessor.from_pretrained(
             self.model_name,
             token=self.hf_token,
-            trust_remote_code=True,
         )
 
         kwargs: dict[str, Any] = {
             "token": self.hf_token,
-            "trust_remote_code": True,
-            "torch_dtype": torch.float16,
+            "torch_dtype": torch.bfloat16,
         }
 
         if load_in_4bit:
@@ -377,7 +375,7 @@ class CHDEvaluator:
                 from transformers import BitsAndBytesConfig
                 kwargs["quantization_config"] = BitsAndBytesConfig(
                     load_in_4bit=True,
-                    bnb_4bit_compute_dtype=torch.float16,
+                    bnb_4bit_compute_dtype=torch.bfloat16,
                 )
             except ImportError:
                 logger.warning(
@@ -391,26 +389,7 @@ class CHDEvaluator:
             kwargs["device_map"] = self._device_arg
 
         logger.info("Loading model weights for %s …", self.model_name)
-
-        # Try Vision2Seq first (PaliGemma, InstructBLIP, etc.),
-        # then fall back to CausalLM (LLaVA, MedGemma, etc.).
-        model = None
-        for cls_name in ("AutoModelForVision2Seq", "AutoModelForCausalLM"):
-            try:
-                import transformers
-                cls = getattr(transformers, cls_name)
-                model = cls.from_pretrained(self.model_name, **kwargs)
-                logger.info("Loaded with %s.", cls_name)
-                break
-            except (AttributeError, ValueError, TypeError, OSError) as exc:
-                logger.debug("Could not load with %s: %s", cls_name, exc)
-
-        if model is None:
-            raise RuntimeError(
-                f"Could not load '{self.model_name}' with AutoModelForVision2Seq "
-                "or AutoModelForCausalLM. Check the model ID and your HF token."
-            )
-
+        model = AutoModelForImageTextToText.from_pretrained(self.model_name, **kwargs)
         model.eval()
         try:
             device_str = str(next(model.parameters()).device)
@@ -426,38 +405,29 @@ class CHDEvaluator:
     def _build_inputs(self, image: Image.Image, prompt_text: str) -> dict:
         """Tokenise an (image, prompt) pair into model inputs.
 
-        Uses ``apply_chat_template`` when available (modern instruction-tuned
-        models), otherwise falls back to a bare ``<image>\\n<prompt>`` string.
+        Follows the official Google MedGemma pattern: image is embedded
+        directly in the messages dict and the full tokenisation is done
+        inside apply_chat_template.
         """
         messages = [
             {
                 "role": "user",
                 "content": [
-                    {"type": "image"},
+                    {"type": "image", "image": image},
                     {"type": "text", "text": prompt_text},
                 ],
             }
         ]
 
-        try:
-            text = self.processor.apply_chat_template(
-                messages,
-                tokenize=False,
-                add_generation_prompt=True,
-            )
-        except (AttributeError, Exception):
-            # Fallback for models without a chat template
-            text = f"<image>\n{prompt_text}"
-
-        inputs = self.processor(
-            images=image,
-            text=text,
-            return_tensors="pt",
-        )
-
-        # Move all tensors to the model's primary device
         device = next(self.model.parameters()).device
-        return {k: v.to(device) if torch.is_tensor(v) else v for k, v in inputs.items()}
+        inputs = self.processor.apply_chat_template(
+            messages,
+            add_generation_prompt=True,
+            tokenize=True,
+            return_dict=True,
+            return_tensors="pt",
+        ).to(device, dtype=torch.bfloat16)
+        return inputs
 
     # ------------------------------------------------------------------
     # Public API
@@ -477,7 +447,7 @@ class CHDEvaluator:
         try:
             inputs = self._build_inputs(image, prompt)
 
-            with torch.no_grad():
+            with torch.inference_mode():
                 output_ids = self.model.generate(
                     **inputs,
                     max_new_tokens=self.max_new_tokens,
