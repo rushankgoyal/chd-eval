@@ -1,0 +1,8 @@
+model_id: "google/medgemma-4b-it"
+display_name: "MedGemma-4B"
+backend: "hf_medgemma"
+max_new_tokens: 512
+hf_load_in_4bit: false
+hf_device: "auto"
+inference_params:
+  do_sample: false

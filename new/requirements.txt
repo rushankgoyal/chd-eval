@@ -1,0 +1,42 @@
+# CHD-VLM Evaluation Framework
+# ================================
+# Install all dependencies:
+#   pip install -r requirements.txt
+#
+# For Colab HF notebook only (GPU models):
+#   pip install -r requirements.txt  (full install)
+#
+# For API-only notebook (no GPU):
+#   pip install Pillow pandas numpy scikit-learn scipy matplotlib seaborn tqdm pyyaml python-dotenv openai anthropic google-generativeai
+
+# ── Core ML (HuggingFace models) ──────────────────────────────────────────
+torch>=2.1.0
+torchvision>=0.16.0
+transformers>=4.47.0
+accelerate>=0.27.0
+huggingface_hub>=0.22.0
+bitsandbytes>=0.41.0       # 4-bit quantisation (GPU only)
+qwen-vl-utils>=0.0.8       # Required for Qwen2.5-VL inference
+
+# ── API model SDKs ────────────────────────────────────────────────────────
+openai>=1.10.0
+anthropic>=0.25.0
+google-generativeai>=0.5.0
+
+# ── Data & Numerics ───────────────────────────────────────────────────────
+Pillow>=10.0.0
+pandas>=2.0.0
+numpy>=1.24.0
+
+# ── Metrics & Statistics ──────────────────────────────────────────────────
+scikit-learn>=1.3.0
+scipy>=1.11.0
+
+# ── Visualization ─────────────────────────────────────────────────────────
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# ── Utilities ─────────────────────────────────────────────────────────────
+tqdm>=4.65.0
+pyyaml>=6.0
+python-dotenv>=1.0.0

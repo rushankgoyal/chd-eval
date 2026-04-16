@@ -1,0 +1,16 @@
+# Pilot / smoke-test: 2 models × 2 prompts × 20 samples
+# Run this first to verify the full pipeline end-to-end before committing
+# to the full evaluation runs.
+results_dir: "results/pilot"
+batch_size: 1
+api_workers: 2
+save_partial: true
+max_samples: 20
+
+models:
+  - configs/models/medgemma_4b.yaml
+  - configs/models/gpt4o.yaml
+
+prompts:
+  - ZSD
+  - CoT

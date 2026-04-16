@@ -1,0 +1,25 @@
+# Full API model evaluation
+# 3 models × 4 prompts × 828 samples = 9,936 rows
+# No GPU required. Run on Colab CPU or local machine.
+# (notebook: 02_api_eval.ipynb)
+#
+# Estimated cost at current pricing:
+#   GPT-4o:          ~$15-20
+#   Claude-3.5:      ~$20-25
+#   Gemini-1.5-Pro:  ~$5-10
+# Total: ~$40-55
+results_dir: "results/api_full"
+batch_size: 1
+api_workers: 3     # parallel threads for API calls; keep <= 5 for rate limits
+save_partial: true
+
+models:
+  - configs/models/gpt4o.yaml
+  - configs/models/claude_35_sonnet.yaml
+  - configs/models/gemini_15_pro.yaml
+
+prompts:
+  - ZSD
+  - RCE
+  - CoT
+  - RAC

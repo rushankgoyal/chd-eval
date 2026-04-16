@@ -1,0 +1,8 @@
+model_id: "microsoft/llava-med-v1.5-mistral-7b"
+display_name: "LLaVA-Med-7B"
+backend: "hf_llava_med"
+max_new_tokens: 512
+hf_load_in_4bit: true    # 4-bit needed to fit on T4 (16GB)
+hf_device: "auto"
+inference_params:
+  do_sample: false

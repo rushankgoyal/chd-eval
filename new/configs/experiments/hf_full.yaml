@@ -1,0 +1,22 @@
+# Full HuggingFace model evaluation
+# 4 models × 4 prompts × 828 samples = 13,248 rows
+# Run on Colab A100 (notebook: 01_hf_eval_colab.ipynb)
+# Expected runtime: ~2-4 hours total depending on GPU
+#
+# Note: medgemma_27b requires A100; comment it out if only T4 is available
+results_dir: "results/hf_full"
+batch_size: 1      # process one at a time to avoid OOM on T4
+api_workers: 1     # unused for HF
+save_partial: true
+
+models:
+  - configs/models/medgemma_4b.yaml
+  - configs/models/medgemma_27b.yaml
+  - configs/models/llava_med_7b.yaml
+  - configs/models/qwen25_vl_7b.yaml
+
+prompts:
+  - ZSD
+  - RCE
+  - CoT
+  - RAC

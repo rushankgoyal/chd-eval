@@ -1,0 +1,9 @@
+model_id: "gemini-1.5-pro"
+display_name: "Gemini-1.5-Pro"
+backend: "gemini"
+max_new_tokens: 512
+# Pricing as of 2024 (USD per 1K tokens, >128K context tier)
+cost_per_1k_input_tokens: 0.00125
+cost_per_1k_output_tokens: 0.005
+inference_params:
+  temperature: 0.0

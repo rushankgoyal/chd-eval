@@ -1,0 +1,8 @@
+model_id: "Qwen/Qwen2.5-VL-7B-Instruct"
+display_name: "Qwen2.5-VL-7B"
+backend: "hf_qwen25_vl"
+max_new_tokens: 512
+hf_load_in_4bit: true    # 4-bit needed to fit on T4 (16GB)
+hf_device: "auto"
+inference_params:
+  do_sample: false

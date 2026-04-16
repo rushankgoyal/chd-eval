@@ -1,0 +1,8 @@
+model_id: "google/medgemma-27b-it"
+display_name: "MedGemma-27B"
+backend: "hf_medgemma"
+max_new_tokens: 512
+hf_load_in_4bit: true    # 4-bit required on A100 40GB; disable on 80GB
+hf_device: "auto"
+inference_params:
+  do_sample: false
